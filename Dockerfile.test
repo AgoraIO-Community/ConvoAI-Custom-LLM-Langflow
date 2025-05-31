@@ -1,0 +1,48 @@
+FROM node:20-slim
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Copy source code and config files
+COPY . .
+
+# Install all dependencies (including dev dependencies for building)
+RUN npm ci
+
+# Build TypeScript code
+RUN npm run build
+
+# Remove dev dependencies to reduce image size
+RUN npm prune --production
+
+# Bake in environment variables for testing
+ENV NODE_ENV=production
+ENV PORT=3000
+ENV LLM_PROVIDER=langflow
+
+# Agora Configuration (replace with your actual values)
+ENV AGORA_APP_ID=your_app_id_here
+ENV AGORA_APP_CERTIFICATE=your_certificate_here
+ENV AGORA_CUSTOMER_ID=your_customer_id_here
+ENV AGORA_CUSTOMER_SECRET=your_customer_secret_here
+
+# Agent Configuration
+ENV AGENT_ID=your_agent_id_here
+
+# OpenAI Configuration (if using)
+ENV OPENAI_API_KEY=your_openai_key_here
+ENV OPENAI_MODEL=gpt-4o-mini
+ENV USE_RESPONSES_API=false
+
+# Langflow Configuration
+ENV LANGFLOW_URL=your_langflow_url_here
+ENV LANGFLOW_API_KEY=your_langflow_key_here
+ENV LANGFLOW_FLOW_ID=your_flow_id_here
+
+# Expose the port the app runs on
+EXPOSE 3000
+
+# Command to run the application
+CMD ["npm", "start"] 
